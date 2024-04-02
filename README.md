@@ -22,7 +22,7 @@ This code is tested on [Ubuntu 20.04 LTS，python 3.9，pytorch 1.12.0].
 We use the annotation files in [HandOccNet](https://github.com/namepllet/HandOccNet). Download and place the annotation files following the instructions in HandOccNet.
 
 ## 4. Test
-Place the [pretrained model]() at `output/model_dump/` and run
+Place the [pretrained model](https://1drv.ms/u/s!AsjOlKfg2ljb2S9uWqzfu6fEUiSD?e=058TZV) at `output/model_dump/` and run
 ```
 python main/test.py --test_epoch {test epoch}  
 ```  
