@@ -1,0 +1,13 @@
+chumpy==0.70
+einops==0.7.0
+matplotlib==3.7.1
+numpy==1.23.5
+opencv_python==4.7.0.72
+pycocotools==2.0.6
+pyrender==0.1.45
+scipy==1.12.0
+setuptools==66.0.0
+torch==1.12.0
+torchvision==0.13.0
+tqdm==4.65.0
+trimesh==3.21.5
