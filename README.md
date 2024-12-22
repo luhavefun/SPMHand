@@ -28,7 +28,7 @@ python main/test.py --test_epoch {test epoch}
 ```  
 The result will generate at `output/result/`. Upload the .zip file to [ho3d-v2 test server](https://codalab.lisn.upsaclay.fr/competitions/4318).
 
-
+For HO3D-v3, use the [pretrained model](https://1drv.ms/u/s!AsjOlKfg2ljb9WEzjwNvZidvKrs6?e=QeLNJr) and upload the results to [ho3d-v3 test server](https://codalab.lisn.upsaclay.fr/competitions/4393).
 
 
 ## Citation
