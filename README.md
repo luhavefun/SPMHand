@@ -30,6 +30,18 @@ The result will generate at `output/result/`. Upload the .zip file to [ho3d-v2 t
 
 For HO3D-v3, use the [pretrained model](https://1drv.ms/u/s!AsjOlKfg2ljb9WEzjwNvZidvKrs6?e=QeLNJr) and upload the results to [ho3d-v3 test server](https://codalab.lisn.upsaclay.fr/competitions/4393).
 
+## 4. Train
+For HO3D-v2 dataset, we use the visible hand segmentions fron the original dataset. Download whole hand segmentations from [here](https://1drv.ms/u/c/db58dae0a794cec8/EbWcvQGZRidFuWKPaCzY7dQB7KB80xnyXy18-Gx8sCZ_eA?e=SkciNM) and update lines 56-57 in the `config.py`.
+
+To train the model with Obman pretraining, download the pretrain weights fron [here](https://1drv.ms/u/c/db58dae0a794cec8/EbxYgcIRNvRKng3RXOS6eQEBElmYCCbXw5dC-hP1fZtteQ?e=u8eUYE) and run
+```
+python main/train.py  --pretrain --pretrain_cpt {cpt_path}
+```
+
+To train the model without pretraining, download the stage1 weights fron [here](https://1drv.ms/u/c/db58dae0a794cec8/Ee8AKE44bq5BkUpuX4VmMCYBhuwGKpb8tJwJvgbdS7ZXrA?e=1cVS9g) and run
+```
+python main/train.py  --stage_seg --stage_seg_cpt {cpt_path}
+``` 
 
 ## Citation
 
