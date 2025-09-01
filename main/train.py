@@ -1,6 +1,6 @@
 import os
 
-os.environ["CUDA_VISIBLE_DEVICES"] = '1'
+os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 import argparse
 from config import cfg
 from common.base import Trainer
@@ -11,9 +11,9 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--gpu', type=str, default='0', dest='gpu_ids')
     parser.add_argument('--continue',  dest='continue_train', default=False)
-    parser.add_argument('--pretrain', type=bool, default=True)
+    parser.add_argument('--pretrain', action='store_true', default=False)
     parser.add_argument('--pretrain_cpt', type=str)
-    parser.add_argument('--stage_seg', type=bool, default=False)
+    parser.add_argument('--stage_seg', action='store_true', default=False)
     parser.add_argument('--stage_seg_cpt', type=str)
 
     args = parser.parse_args()
@@ -30,16 +30,23 @@ def parse_args():
     return args
 
 
+def update_cfg(args):
+    cfg.set_args(args)
+    if cfg.pretrain:
+        cfg.lr = cfg.lr * 0.5
+
+
+
 def main():
     
     # argument parse and create log
     args = parse_args()
-    cfg.set_args(args.gpu_ids, args.continue_train)
+    update_cfg(args)
     cudnn.benchmark = True
 
-    trainer = Trainer()
-    trainer._make_batch_generator()
+    trainer = Trainer(cfg)
     trainer._make_model()
+    trainer._make_batch_generator()
 
     for epoch in range(trainer.start_epoch, cfg.end_epoch):
         
