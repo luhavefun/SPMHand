@@ -84,7 +84,7 @@ class Model(nn.Module):
             pred_mask = self.get_pred_mask(pred_mano_results, meta_info) * cfg.lambda_seg * cfg.loss_scale
             loss['render'] = F.mse_loss(targets['mask_whole_patch_256'][:, 0, :, :], pred_mask[:, :, :, 0]) * cfg.lambda_proj * cfg.loss_scale
             loss['seg'] = self.seg_loss(seg_f[1], targets['mask']) * cfg.lambda_seg * cfg.loss_scale
-            loss['seg_whole'] = self.seg_loss(seg_f[0], targets['mask_whole']) * 0.5
+            loss['seg_whole'] = self.seg_loss(seg_f[0], targets['mask_whole']) * cfg.lambda_seg * cfg.loss_scale
             self.mano_loss(loss, mano_results[0], gt_mano_results, 0, cfg.lambda_coarse2decent)
             self.mano_loss(loss, mano_results[1], gt_mano_results, 1, cfg.lambda_coarse2decent)
             self.mano_loss(loss, mano_results[2], gt_mano_results, 2, cfg.lambda_coarse2decent)
