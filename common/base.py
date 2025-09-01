@@ -42,23 +42,24 @@ class Base(object):
         return
 
 class Trainer(Base):
-    def __init__(self):
+    def __init__(self, model_cfg):
         super(Trainer, self).__init__(log_name = 'train_logs.txt')
+        self.cfg = model_cfg
 
     def get_optimizer(self, model):
         model_params = filter(lambda p: p.requires_grad, model.parameters())
-        optimizer = torch.optim.Adam(model_params, lr=cfg.lr)
+        optimizer = torch.optim.Adam(model_params, lr=self.cfg.lr)
         return optimizer
 
     def save_model(self, state, epoch):
-        file_path = osp.join(cfg.model_dir,'snapshot_{}.pth.tar'.format(str(epoch)))
+        file_path = osp.join(self.cfg.model_dir,'snapshot_{}.pth.tar'.format(str(epoch)))
         torch.save(state, file_path)
         self.logger.info("Write snapshot into {}".format(file_path))
 
     def load_model(self, model, optimizer):
-        model_file_list = glob.glob(osp.join(cfg.model_dir,'*.pth.tar'))
+        model_file_list = glob.glob(osp.join(self.cfg.model_dir,'*.pth.tar'))
         cur_epoch = max([int(file_name[file_name.find('snapshot_') + 9 : file_name.find('.pth.tar')]) for file_name in model_file_list])
-        ckpt_path = osp.join(cfg.model_dir, 'snapshot_' + str(cur_epoch) + '.pth.tar')
+        ckpt_path = osp.join(self.cfg.model_dir, 'snapshot_' + str(cur_epoch) + '.pth.tar')
         ckpt = torch.load(ckpt_path)
         start_epoch = ckpt['epoch'] + 1
         model.load_state_dict(ckpt['network'], strict=False)
@@ -67,16 +68,16 @@ class Trainer(Base):
         return start_epoch, model, optimizer
 
     def set_lr(self, epoch):
-        for e in cfg.lr_dec_epoch:
+        for e in self.cfg.lr_dec_epoch:
             if epoch < e:
                 break
-        if epoch < cfg.lr_dec_epoch[-1]:
-            idx = cfg.lr_dec_epoch.index(e)
+        if epoch < self.cfg.lr_dec_epoch[-1]:
+            idx = self.cfg.lr_dec_epoch.index(e)
             for g in self.optimizer.param_groups:
-                g['lr'] = cfg.lr * (cfg.lr_dec_factor ** idx)
+                g['lr'] = self.cfg.lr * (self.cfg.lr_dec_factor ** idx)
         else:
             for g in self.optimizer.param_groups:
-                g['lr'] = cfg.lr * (cfg.lr_dec_factor ** len(cfg.lr_dec_epoch))
+                g['lr'] = self.cfg.lr * (self.cfg.lr_dec_factor ** len(self.cfg.lr_dec_epoch))
 
     def get_lr(self):
         for g in self.optimizer.param_groups:
@@ -86,10 +87,10 @@ class Trainer(Base):
     def _make_batch_generator(self):
         # data load and construct batch generator
         self.logger.info("Creating dataset...")
-        train_dataset = eval(cfg.trainset)(transforms.ToTensor(), "train")
+        train_dataset = eval(self.cfg.trainset)(transforms.ToTensor(), "train")
 
-        self.itr_per_epoch = math.ceil(len(train_dataset) / cfg.num_gpus / cfg.train_batch_size)
-        self.batch_generator = DataLoader(dataset=train_dataset, batch_size=cfg.num_gpus*cfg.train_batch_size, shuffle=True, num_workers=cfg.num_thread, pin_memory=True)
+        self.itr_per_epoch = math.ceil(len(train_dataset) / self.cfg.num_gpus / self.cfg.train_batch_size)
+        self.batch_generator = DataLoader(dataset=train_dataset, batch_size=self.cfg.num_gpus*self.cfg.train_batch_size, shuffle=True, num_workers=self.cfg.num_thread, pin_memory=True)
 
     def _make_model(self):
         # prepare network
@@ -100,14 +101,14 @@ class Trainer(Base):
         optimizer = self.get_optimizer(model)
 
 
-        if cfg.pretrain:
-            model.load_state_dict(cfg.pretrain_cpt['network'])
-            self.logger.info('Load pretrain model from {}'.format(cfg.pretrain_cpt))
-        if cfg.stage_seg:
-            model.load_state_dict(cfg.stage_seg_cpt['network'], strict=False)
-            self.logger.info('Load stage_seg model from {}'.format(cfg.stage_seg_cpt))
+        if self.cfg.pretrain:
+            model.load_state_dict(torch.load(self.cfg.pretrain_cpt)['network'])
+            self.logger.info('Load pretrain model from {}'.format(self.cfg.pretrain_cpt))
+        if self.cfg.stage_seg:
+            model.load_state_dict(torch.load(self.cfg.stage_seg_cpt)['network'], strict=False)
+            self.logger.info('Load stage_seg model from {}'.format(self.cfg.stage_seg_cpt))
 
-        if cfg.continue_train:
+        if self.cfg.continue_train:
             start_epoch, model, optimizer = self.load_model(model, optimizer)
         else:
             start_epoch = 0
